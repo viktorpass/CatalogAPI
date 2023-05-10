@@ -17,17 +17,18 @@ namespace APICatalogo.Controllers {
 
         [HttpGet]
      
-        public ActionResult<IEnumerable<Product>> Get() {
+        public async Task<ActionResult<IEnumerable<Product>>> Get() {
             try {
-                var products = _context.Products.AsNoTracking().ToList();
+                var  products = await _context.Products.AsNoTracking().ToListAsync();
 
                 if (products is null) {
                     return NotFound("Products not found...");
                 }
 
                 return products;
+
             }
-            catch (Exception e) {
+            catch (Exception) {
 
                 return StatusCode(StatusCodes.Status500InternalServerError,
                     "An error ocurred during the request");
@@ -37,10 +38,10 @@ namespace APICatalogo.Controllers {
 
         [HttpGet("{id:int}", Name = "GetProduct")]
 
-        public ActionResult<Product> Get(int id) {
+        public async Task<ActionResult<Product>> Get(int id) {
 
             try {
-                var product = _context.Products.FirstOrDefault(p => p.ProductId == id);
+                var product = await _context.Products.AsNoTracking().FirstOrDefaultAsync(p => p.ProductId == id);
                 if (product is null) {
                     return NotFound("Product not found...");
                 }

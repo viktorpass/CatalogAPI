@@ -18,10 +18,10 @@ namespace APICatalogo.Controllers {
 
 
         [HttpGet("products")]
-        public ActionResult<IEnumerable<Category>> GetCategoryAndProducts() {
+        public async Task<ActionResult<IEnumerable<Category>>> GetCategoryAndProducts() {
 
             try {
-                return _context.Categories.Include(p => p.Products).AsNoTracking().ToList();
+                return await _context.Categories.Include(p => p.Products).AsNoTracking().ToListAsync();
             }
             catch (Exception) {
 
@@ -32,9 +32,9 @@ namespace APICatalogo.Controllers {
 
 
         [HttpGet]
-        public ActionResult<IEnumerable<Category>> Get() {
+        public async Task<ActionResult<IEnumerable<Category>>> Get() {
             try {
-                return _context.Categories.AsNoTracking().ToList();
+                return await _context.Categories.AsNoTracking().ToListAsync();
             }
             catch (Exception) {
 
@@ -45,9 +45,9 @@ namespace APICatalogo.Controllers {
 
 
         [HttpGet("{id:int}", Name = "GetCategory")]
-        public ActionResult<Category> Get(int id) {
+        public async Task<ActionResult<Category>> Get(int id) {
             try {
-                var category = _context.Categories.FirstOrDefault(p => p.CategoryId == id);
+                var category = await _context.Categories.FirstOrDefaultAsync(p => p.CategoryId == id);
 
                 if (category == null) {
                     return NotFound("Category not found...");
