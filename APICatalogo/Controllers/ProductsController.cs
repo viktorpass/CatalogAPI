@@ -1,8 +1,11 @@
 ﻿using APICatalogo.Context;
+using APICatalogo.Dto;
 using APICatalogo.Models;
+using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
 
 namespace APICatalogo.Controllers {
     [Route("api/[controller]")]
@@ -10,22 +13,25 @@ namespace APICatalogo.Controllers {
     public class ProductsController : ControllerBase {
 
         private readonly AppDbContext _context;
+        private readonly IMapper _mapper;
 
-        public ProductsController(AppDbContext context) {
+        public ProductsController(AppDbContext context, IMapper mapper) {
             _context = context;
+            _mapper = mapper;
         }
 
         [HttpGet]
      
         public async Task<ActionResult<IEnumerable<Product>>> Get() {
             try {
-                var  products = await _context.Products.AsNoTracking().ToListAsync();
+                var products = await _context.Products.AsNoTracking().ToListAsync();
+                
 
                 if (products is null) {
                     return NotFound("Products not found...");
                 }
-
-                return products;
+                var productsDto = _mapper.Map<List<ProductsDto>>(products);
+                return Ok(productsDto);
 
             }
             catch (Exception) {
@@ -45,7 +51,8 @@ namespace APICatalogo.Controllers {
                 if (product is null) {
                     return NotFound("Product not found...");
                 }
-                return product;
+                var productDto = _mapper.Map<ProductsDto>(product);
+                return Ok(productDto);
             }
             catch (Exception) {
 
@@ -67,8 +74,10 @@ namespace APICatalogo.Controllers {
                 _context.Products.Add(product);
                 _context.SaveChanges();
 
+                var productDto = _mapper.Map<ProductsDto>(product);
+
                 return new CreatedAtRouteResult("GetProduct",
-                    new { id = product.ProductId }, product);
+                    new { id = productDto.ProductId }, productDto);
             }
             catch (Exception) {
 
